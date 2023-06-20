@@ -4,9 +4,9 @@ var io = require('socket.io')(http);
 var client_socket = {};
 var client_instance = {};
 
-const client = require('../lib/client');
-require('../lib/common.js');
-require('dotenv').config();
+const client = require('../VAST.js/lib/client');
+require('../VAST.js/lib/common.js');
+// require('dotenv').config();
 const SIZE = 1000; // world size
 var C;
 
