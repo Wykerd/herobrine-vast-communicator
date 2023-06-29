@@ -67,7 +67,8 @@ io.on('connection', function(socket){
 
     socket.on('subscribe', function(x, y, radius, channel) {
         const uuid = Object.keys(client_socket).find(key => client_socket[key] === socket);
-        client_instance[uuid].subscribe(x, y, radius, channel);
+        // client_instance[uuid].subscribe(x, y, radius, channel);
+        client_instance[uuid].subscribe({x: x, y: y, radius: radius}, channel);
         // client_instance[uuid].subscribeMobile(radius, channel);
         console.log(`Subscribed to channel '${channel}' at AoI [${x}; ${y}; ${radius}]`);
     });
@@ -97,7 +98,7 @@ io.on('connection', function(socket){
         const uuid = Object.keys(client_socket).find(key => client_socket[key] === socket);
         client_instance[uuid].publish(x, y, radius, data, channel);
         
-        console.log('I have published: ' + tempcounter )
+        // console.log('I have published: ' + tempcounter )
 
         // console.log(`Published to channel '${channel}' with payload '${data}' at AoI [${x}; ${y}; ${radius}]`);
         console.log(`Published to channel '${channel}' at AoI [${x}; ${y}; ${radius}]`);
