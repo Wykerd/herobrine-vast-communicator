@@ -62,9 +62,6 @@ io.on('connection', function(socket){
         socket.emit('log', 'VAST_COM::Client that represents server on VAST has spawned.');
     });
     
-
-    
-
     socket.on('subscribe', function(x, y, radius, channel) {
         const uuid = Object.keys(client_socket).find(key => client_socket[key] === socket);
         // client_instance[uuid].subscribe(x, y, radius, channel);
@@ -72,6 +69,24 @@ io.on('connection', function(socket){
         // client_instance[uuid].subscribeMobile(radius, channel);
         console.log(`Subscribed to channel '${channel}' at AoI [${x}; ${y}; ${radius}]`);
     });
+
+    socket.on('subscribe_polygon', function(jsonPositions, channel) {
+        const uuid = Object.keys(client_socket).find(key => client_socket[key] === socket);
+    
+        // Parse positions from JSON
+        const positions = JSON.parse(jsonPositions);
+    
+        // Convert positions to the required format
+        const points = positions.map(pos => ({x: Math.floor(pos[0]), y: Math.floor(pos[1])}));
+
+        // console.log(points)
+
+        // if (points.length < 15) {
+            client_instance[uuid].subscribe(points, "channel");
+        // }
+    
+        console.log(`Subscribed to channel '${channel}' with polygon.`);
+    });  
 
     var tempcounter = 0;
     socket.on('publish', function(connectionID, username, x, y, radius, actualPacket, channel) {
@@ -129,11 +144,18 @@ io.on('connection', function(socket){
         console.log('Disconnected client from matcher');
     });
 
-    socket.on('clearsubscriptions', function() {
+    socket.on('clearsubscriptions', function(channel) {
         const uuid = Object.keys(client_socket).find(key => client_socket[key] === socket);
-        client_instance[uuid].clearSubscriptions();
-        console.log('Cleared all subscriptions');
+    
+        if(channel) {
+            client_instance[uuid].clearSubscriptions(channel);
+            console.log(`Cleared subscription for channel: ${channel}`);
+        } else {
+            client_instance[uuid].clearSubscriptions();
+            console.log('Cleared all subscriptions');
+        }
     });
+    
 
 });
 
