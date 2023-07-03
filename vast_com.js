@@ -82,7 +82,7 @@ io.on('connection', function(socket){
         // console.log(points)
 
         // if (points.length < 15) {
-            client_instance[uuid].subscribe(points, "channel");
+            client_instance[uuid].subscribe(points, channel);
         // }
     
         console.log(`Subscribed to channel '${channel}' with polygon.`);
