@@ -4,6 +4,14 @@ var io = require('socket.io')(http);
 var client_socket = {};
 var client_instance = {};
 
+const { log: dataLog } = require('../VAST.js/test/dataCapture.js');
+const LogCategory = {
+    VAST_COM_INBOUND: 'VAST_COM_INBOUND',
+  };
+
+const DEFAULT_PORT = 3456;
+const customPort = process.argv[2] || DEFAULT_PORT;
+
 const client = require('../VAST.js/lib/client');
 require('../VAST.js/lib/common.js');
 // require('dotenv').config();
@@ -43,25 +51,25 @@ io.on('connection', function(socket){
         console.log('VAST client spawn');
         var r = 10; // radius
         id = generateId();
-    
+
         if (x === undefined || y === undefined) {
             x = Math.random() * SIZE;
             y = Math.random() * SIZE;
         }
-    
+
         const C = await createClientAsync(socket, gwHost, gwPort, id, x, y, r);
-    
+
         console.log('Finished creating client');
         C.setAlias(alias);
         console.log('Finished setting alias');
-    
+
         const uuid = Object.keys(client_socket).find(key => client_socket[key] === socket);
         console.log(`Adding client instance for UUID: ${uuid}`);
         client_instance[uuid] = C;
-    
+
         socket.emit('log', 'VAST_COM::Client that represents server on VAST has spawned.');
     });
-    
+
     socket.on('subscribe', function(x, y, radius, channel) {
         const uuid = Object.keys(client_socket).find(key => client_socket[key] === socket);
         // client_instance[uuid].subscribe(x, y, radius, channel);
@@ -70,12 +78,36 @@ io.on('connection', function(socket){
         console.log(`Subscribed to channel '${channel}' at AoI [${x}; ${y}; ${radius}]`);
     });
 
-    socket.on('subscribe_polygon', function(jsonPositions, channel) {
+    socket.on('subscribe_mobile', function(x, y, radius, channel) {
         const uuid = Object.keys(client_socket).find(key => client_socket[key] === socket);
-    
+        client_instance[uuid].subscribeMobile({x: x, y: y, radius: radius}, channel);
+        console.log(`Subscribed to channel '${channel}' with mobile AoI [${radius}]`);
+    });
+
+    socket.on('subscribe_mobile_polygon', function(jsonPositions, channel) {
+        const uuid = Object.keys(client_socket).find(key => client_socket[key] === socket);
+
         // Parse positions from JSON
         const positions = JSON.parse(jsonPositions);
-    
+
+        // Convert positions to the required format
+        const points = positions.map(pos => ({x: Math.floor(pos[0]), y: Math.floor(pos[1])}));
+
+        // console.log(points)
+
+        // if (points.length < 15) {
+            client_instance[uuid].subscribeMobile(points, channel);
+        // }
+
+        console.log(`Subscribed to channel '${channel}' with mobile polygon.`);
+    });
+
+    socket.on('subscribe_polygon', function(jsonPositions, channel) {
+        const uuid = Object.keys(client_socket).find(key => client_socket[key] === socket);
+
+        // Parse positions from JSON
+        const positions = JSON.parse(jsonPositions);
+
         // Convert positions to the required format
         const points = positions.map(pos => ({x: Math.floor(pos[0]), y: Math.floor(pos[1])}));
 
@@ -84,12 +116,16 @@ io.on('connection', function(socket){
         // if (points.length < 15) {
             client_instance[uuid].subscribe(points, channel);
         // }
-    
+
         console.log(`Subscribed to channel '${channel}' with polygon.`);
-    });  
+    });
 
     var tempcounter = 0;
     socket.on('publish', function(connectionID, username, x, y, radius, actualPacket, channel) {
+
+        if (username.split("&")[1]) {
+            dataLog(username.split("&")[1], LogCategory.VAST_COM_INBOUND)
+        }
 
         tempcounter += 1
         // console.log('x value: ' + x);
@@ -100,7 +136,7 @@ io.on('connection', function(socket){
 
         // console.log('This is the actaul packet: ' + actualPacket)
 
-        data = {} // should be 
+        data = {} // should be
         data["connectionID"] = connectionID;
 		data["username"] = username;
 		data["x"] = x;
@@ -112,11 +148,12 @@ io.on('connection', function(socket){
 
         const uuid = Object.keys(client_socket).find(key => client_socket[key] === socket);
         client_instance[uuid].publish(x, y, radius, data, channel);
-        
+
         // console.log('I have published: ' + tempcounter )
 
         // console.log(`Published to channel '${channel}' with payload '${data}' at AoI [${x}; ${y}; ${radius}]`);
-        console.log(`Published to channel '${channel}' at AoI [${x}; ${y}; ${radius}]`);
+        // console.log(`Published to channel '${channel}' at AoI [${x}; ${y}; ${radius}]`);
+        data = null;
 
     });
 
@@ -146,7 +183,7 @@ io.on('connection', function(socket){
 
     socket.on('clearsubscriptions', function(channel) {
         const uuid = Object.keys(client_socket).find(key => client_socket[key] === socket);
-    
+
         if(channel) {
             client_instance[uuid].clearSubscriptions(channel);
             console.log(`Cleared subscription for channel: ${channel}`);
@@ -155,12 +192,12 @@ io.on('connection', function(socket){
             console.log('Cleared all subscriptions');
         }
     });
-    
+
 
 });
 
-http.listen(3456, function(){
-  console.log('listening on *:3456');
+http.listen(customPort, function(){
+  console.log(`listening on *:${customPort}`);
 });
 
 function generateId() {
