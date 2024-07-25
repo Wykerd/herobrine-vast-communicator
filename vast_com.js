@@ -168,10 +168,12 @@ io.on('connection', function(socket){
         client_instance[uuid].clearSubscriptions();
     });
 
+
     socket.on('move', function(x, y) {
-        const uuid = Object.keys(client_socket).find(key => client_socket[key] === socket);
-        client_instance[uuid].move(x, y);
-        console.log(`Moved client to position [${x}; ${y}]`);
+            const uuid = Object.keys(client_socket).find(key => client_socket[key] === socket);
+            client_instance[uuid].move(x, y);
+            console.log(`Moved client to position [${x}; ${y}]`);
+            moveCounter = 0;
     });
 
     socket.on('disconnect_client', function() {
@@ -217,12 +219,12 @@ function createClientAsync(socket, gwHost, gwPort, id, x, y, r) {
         // Do something to create a client instance asynchronously.
         // In this example, we're just simulating an async operation using setTimeout.
         setTimeout(() => {
-            const C = new client(socket, gwHost, gwPort, id, x, y, r, function (id) {
+            const C = new client(gwHost, gwPort, id, x, y, r, function (id) {
                     _id = id;
                     console.log(`Client ${x}, ${y} successfully created with id: ${id}`);
                     let m = C.getMatcherID();
                     console.log(`Assigned to matcher with id ${m}`);
-                });
+                }, socket);
             console.log('Done?');
             resolve(C);
         }, 0);  // 0 millisecond delay, change to simulate async operation
