@@ -16,6 +16,8 @@ const customPort = process.argv[2] || DEFAULT_PORT;
 
 const client = require('VAST.js/lib/client');
 require('VAST.js/lib/common.js');
+
+global.VISUALISE_DEBUG_LOGS = false;
 // require('dotenv').config();
 const SIZE = 1000; // world size
 var C;
