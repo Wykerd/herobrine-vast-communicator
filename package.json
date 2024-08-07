@@ -1,17 +1,17 @@
 {
   "dependencies": {
     "express": "^4.19.2",
-    "socket.io": "^4.7.5"
+    "socket.io": "^4.7.5",
+    "vast.js": "github:Wykerd/VAST.js#visualiser-minecraft-2"
   },
   "name": "herobrine-vast-communicator",
   "version": "0.0.1",
   "main": "vast_com.js",
-  "devDependencies": {
-    "pkg": "^5.8.1"
+  "bin": {
+    "vast_com": "./vast_com.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "pkg -t node18-macos-arm64 vast_com.js --out-path ./dist"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",

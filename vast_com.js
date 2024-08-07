@@ -1,10 +1,12 @@
+#!/usr/bin/env node
+
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var client_socket = {};
 var client_instance = {};
 
-const { log: dataLog } = require('../VAST.js/test/dataCapture.js');
+const { log: dataLog } = require('VAST.js/test/dataCapture.js');
 const LogCategory = {
     VAST_COM_INBOUND: 'VAST_COM_INBOUND',
   };
@@ -12,8 +14,8 @@ const LogCategory = {
 const DEFAULT_PORT = 3456;
 const customPort = process.argv[2] || DEFAULT_PORT;
 
-const client = require('../VAST.js/lib/client');
-require('../VAST.js/lib/common.js');
+const client = require('VAST.js/lib/client');
+require('VAST.js/lib/common.js');
 // require('dotenv').config();
 const SIZE = 1000; // world size
 var C;
