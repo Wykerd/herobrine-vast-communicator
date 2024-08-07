@@ -402,3 +402,5 @@ VastPackets/SPSCLIENT_M_in_packet_log.csv
 VastPackets/SPSCLIENT_M_out_packet_log.csv
 VastPackets/SPSCLIENT_VC_in_packet_log.csv
 VastPackets/SPSCLIENT_VC_out_packet_log.csv
+
+dist/

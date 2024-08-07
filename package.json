@@ -1,0 +1,25 @@
+{
+  "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5"
+  },
+  "name": "herobrine-vast-communicator",
+  "version": "0.0.1",
+  "main": "vast_com.js",
+  "devDependencies": {
+    "pkg": "^5.8.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "pkg -t node18-macos-arm64 vast_com.js --out-path ./dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PJSmit-SUN/herobrine-vast-communicator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/PJSmit-SUN/herobrine-vast-communicator/issues"
+  },
+  "homepage": "https://github.com/PJSmit-SUN/herobrine-vast-communicator#readme",
+  "description": ""
+}
